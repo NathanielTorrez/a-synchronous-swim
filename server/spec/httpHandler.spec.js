@@ -26,12 +26,17 @@ describe('server responses', () => {
 
       let {req, res} = server.mock('http://127.0.0.1:3001', 'GET');
 
-      let swimCommand = 'up'||'down'||'left'||'right' ;
+
 
       httpHandler.router(req, res);
       expect(res._responseCode).to.equal(200);
       expect(res._ended).to.equal(true);
-      expect(res._data.toString()).to.be.swimCommand;
+      expect(res._data.toString()).to.satisfy(function(response) {
+        if ( res._data.toString() === 'up' || res._data.toString() === 'down' || res._data.toString() === 'left' || res._data.toString() === 'right' ) {
+          return true
+        }
+        return false
+      });
 
     done();
   });
@@ -39,7 +44,7 @@ describe('server responses', () => {
   xit('should respond with 404 to a GET request for a missing background image', (done) => {
     httpHandler.backgroundImageFile = path.join('.', 'spec', 'missing.jpg');
     // fix fill me in
-    let {req, res} = server.mock('FILL_ME_IN', 'GET');
+    let {req, res} = server.mock('http://127.0.0.1:3001', 'GET');
 
     httpHandler.router(req, res, () => {
       expect(res._responseCode).to.equal(404);
@@ -59,7 +64,7 @@ describe('server responses', () => {
     fs.readFile(postTestFile, (err, fileData) => {
       httpHandler.backgroundImageFile = path.join('.', 'spec', 'temp.jpg');
       // fix fill me in
-      let {req, res} = server.mock('FILL_ME_IN', 'POST', fileData);
+      let {req, res} = server.mock('http://127.0.0.1:3001', 'POST', fileData);
 
       httpHandler.router(req, res, () => {
         expect(res._responseCode).to.equal(201);
@@ -73,10 +78,10 @@ describe('server responses', () => {
     fs.readFile(postTestFile, (err, fileData) => {
       httpHandler.backgroundImageFile = path.join('.', 'spec', 'temp.jpg');
       // fix fill me in
-      let post = server.mock('FILL_ME_IN', 'POST', fileData);
+      let post = server.mock('http://127.0.0.1:3001', 'POST', fileData);
       // fix fill me in
       httpHandler.router(post.req, post.res, () => {
-        let get = server.mock('FILL_ME_IN', 'GET');
+        let get = server.mock('http://127.0.0.1:3001', 'GET');
         httpHandler.router(get.req, get.res, () => {
           expect(Buffer.compare(fileData, get.res._data)).to.equal(0);
           done();
