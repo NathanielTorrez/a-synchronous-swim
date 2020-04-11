@@ -26,13 +26,14 @@ describe('server responses', () => {
 
       let {req, res} = server.mock('http://127.0.0.1:3001', 'GET');
 
-
+     // if it stops working move the function to under line 31 and test for true
 
       httpHandler.router(req, res);
       expect(res._responseCode).to.equal(200);
       expect(res._ended).to.equal(true);
       expect(res._data.toString()).to.satisfy(function(response) {
-        if ( res._data.toString() === 'up' || res._data.toString() === 'down' || res._data.toString() === 'left' || res._data.toString() === 'right' ) {
+
+        if ( response === 'up' || response === 'down' || response === 'left' || response === 'right' ) {
           return true
         }
         return false

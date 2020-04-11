@@ -18,14 +18,32 @@ module.exports.router = (req, res, next = ()=>{}) => {
 
   if (req.method === 'GET') {
       // call the writeHead function and the write function
+      var randomCommand = randomOutput()
       res.writeHead(200,headers)
-      res.write(randomOutput())
+      res.write(randomCommand)
+     // module.exports.initialize(randomCommand)
     } else if (req.method === 'OPTIONS') {
       res.writeHead(200, headers);
     }
   res.end();
   next(); // invoke next() at the end of a request to help with testing!
-};
+
+
+
+//   var message = messageQueue.dequeue();
+
+//   if(message !== undefined){
+//     res.writeHead(200,headers);
+//     res.end(message);
+//   }else{
+//     res.writeHead(200,headers);
+//     res.end("");
+//   }
+//   res.writeHead(200,headers)
+//  res.end()
+ }
+
+
  // create a random swim command generator
 randomOutput = () => {
   var randomNumber = Math.floor(Math.random() * (4 - 1 + 1) - 1)
@@ -38,5 +56,5 @@ randomOutput = () => {
     return 'left'
   } else if (randomNumber === 4) {
     return 'right'
-  }
+  } else { return 'up'}
 };
