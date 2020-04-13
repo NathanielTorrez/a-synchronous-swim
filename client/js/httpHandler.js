@@ -1,30 +1,24 @@
+// send a get request
+// call swimTeam.move with the data
+// make sure code is invoked in the index.html
+
 (function() {
 
   const serverUrl = 'http://127.0.0.1:3001';
 
-  //
-  // TODO: build the swim command fetcher here
-  //
 
-  const ajaxGetSwimMove = () =>{
-    $.get(serverUrl, (data) =>{
-      SwimTeam.move(data)
-    })
-  }
+    window.ajaxSwimMove = () => {
+     $.ajax({
+       type: 'GET',
+       url: serverUrl,
+       success: (command) => {
+         console.log(command)
+         SwimTeam.move(command);
+       }
+     });
+   }
 
-
-  $(document).ready((event) =>{
-     var nextMove = function() {
-     ajaxGetSwimMove()
-     setInterval(() =>{
-       console.log('random command working')
-       nextMove()
-     },1000);
-    }
-    nextMove()
-  });
-
-
+   setInterval(ajaxSwimMove, 300);
   /////////////////////////////////////////////////////////////////////
   // The ajax file uplaoder is provided for your convenience!
   // Note: remember to fix the URL below.
@@ -40,7 +34,7 @@
     $.ajax({
       type: 'POST',
       data: formData,
-      url:  serverUrl,
+      url: serverUrl + '/background.jpg',
       cache: false,
       contentType: false,
       processData: false,
@@ -61,10 +55,10 @@
     }
 
     var file = form.files[0];
-    // if (file.type !== 'image/jpeg') {
-    //   console.log('Not a jpg file!');
-    //   return;
-    // }
+    if (file.type !== 'image/jpeg') {
+      console.log('Not a jpg file!');
+      return;
+    }
 
     ajaxFileUplaod(file);
   });

@@ -13,48 +13,51 @@ module.exports.initialize = (queue) => {
 };
 
 module.exports.router = (req, res, next = ()=>{}) => {
-  console.log('Serving request type ' + req.method + ' for url' + req.url);
-
-
+  // if its a get request
   if (req.method === 'GET') {
-      // call the writeHead function and the write function
-      var randomCommand = randomOutput()
-      res.writeHead(200,headers)
-      res.write(randomCommand)
-     // module.exports.initialize(randomCommand)
-    } else if (req.method === 'OPTIONS') {
+    // if the test path is a /
+    if (req.url === '/') {
       res.writeHead(200, headers);
+      var command = messageQueue.dequeue();
+      if (command) {
+        console.log("responding with ", command);
+        res.end(command)
+      } else {
+        res.end();
+      }
     }
-  res.end();
-  next(); // invoke next() at the end of a request to help with testing!
 
+     if (req.url === '/background.jpg') {
+      fs.readFile(module.exports.backgroundImageFile, (err, fileData) => {
+        if (err) {
+          res.writeHead(404, headers);
+        } else {
+          res.writeHead(200, {
+            'Content-type': 'image/jpg',
+            'Conetent-Length': fileData.length
+          })
+          res.write(fileData, 'binary');
+        }
+        res.end();
+        next();
+      });
+    }
+  }
 
+  if (req.method === 'POST' && req.url === '/background.jpg') {
+    var imageData = Buffer.alloc(0);
 
-//   var message = messageQueue.dequeue();
+    req.on('data', (chunk) => {
+      imageData = Buffer.concat([imageData, chunk]);
+    });
 
-//   if(message !== undefined){
-//     res.writeHead(200,headers);
-//     res.end(message);
-//   }else{
-//     res.writeHead(200,headers);
-//     res.end("");
-//   }
-//   res.writeHead(200,headers)
-//  res.end()
- }
-
-
- // create a random swim command generator
-randomOutput = () => {
-  var randomNumber = Math.floor(Math.random() * (4 - 1 + 1) - 1)
-
-  if (randomNumber === 1) {
-    return 'up'
-  } else if (randomNumber === 2) {
-    return 'down'
-  } else if (randomNumber === 3) {
-    return 'left'
-  } else if (randomNumber === 4) {
-    return 'right'
-  } else { return 'up'}
-};
+    req.on('end', () => {
+      var file = multipart.getFile(imageData);
+      fs.writeFile(module.exports.backgroundImageFile, file.data, (err) => {
+        res.writeHead(err ? 400 : 201, headers);
+        res.end();
+        next();
+      });
+    });
+  }
+ };
